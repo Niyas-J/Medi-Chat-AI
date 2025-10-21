@@ -247,6 +247,30 @@
         }
 
         /* Clear chat button */
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .appointment-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .appointment-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
         .clear-chat-btn {
             background: none;
             border: none;
@@ -273,6 +297,16 @@
 
             body {
                 padding: 10px;
+            }
+
+            .header-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .appointment-btn {
+                font-size: 12px;
+                padding: 6px 12px;
             }
         }
 
@@ -304,7 +338,12 @@
                 <span class="status-indicator"></span>
                 Medi-AI Assistant
             </h3>
-            <button class="clear-chat-btn" onclick="clearChat()">Clear Chat</button>
+            <div class="header-buttons">
+                <button class="appointment-btn" onclick="bookAppointment()">
+                    📅 Book Appointment
+                </button>
+                <button class="clear-chat-btn" onclick="clearChat()">Clear Chat</button>
+            </div>
         </div>
 
         <!-- Messages container -->
@@ -494,6 +533,11 @@
                 messageInput.focus();
             }
         });
+
+        // Book appointment function
+        function bookAppointment() {
+            window.open('https://medi-appointment-scheduler-a0n00lzrq-niyas-js-projects.vercel.app', '_blank');
+        }
     </script>
 </body>
 </html>
