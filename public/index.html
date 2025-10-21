@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medi-AI Chatbot</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        /* Chat window - Full page centered */
+        #chatWindow {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            max-height: 800px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Chat header */
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .minimize-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .minimize-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Messages container */
+        #messagesContainer {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Message bubbles */
+        .message {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        /* Input area */
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            max-height: 100px;
+            min-height: 44px;
+            overflow-y: auto;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #sendButton {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        #sendButton:hover {
+            transform: scale(1.05);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #sendButton svg {
+            fill: white;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            padding: 12px;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 11px;
+            text-align: center;
+            border-top: 1px solid #ffeaa7;
+        }
+
+        /* Clear chat button */
+        .clear-chat-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px 10px;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .clear-chat-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #chatWindow {
+                width: calc(100vw - 20px);
+                height: calc(100vh - 20px);
+                max-height: none;
+                border-radius: 15px;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+
+        /* Scrollbar styling */
+        #messagesContainer::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #messagesContainer::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #messagesContainer::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        #messagesContainer::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Chat window - Full page centered -->
+    <div id="chatWindow">
+        <!-- Chat header -->
+        <div class="chat-header">
+            <h3>
+                <span class="status-indicator"></span>
+                Medi-AI Assistant
+            </h3>
+            <button class="clear-chat-btn" onclick="clearChat()">Clear Chat</button>
+        </div>
+
+        <!-- Messages container -->
+        <div id="messagesContainer">
+            <div class="message assistant">
+                <div class="message-bubble">
+                    👋 Hello! I'm Medi-AI, your health information assistant. How can I help you today?
+                    <br><br>
+                    <small><em>Remember: I provide general information only and am not a substitute for professional medical advice.</em></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Input area -->
+        <div class="chat-input-container">
+            <textarea 
+                id="messageInput" 
+                placeholder="Type your message..."
+                rows="1"
+            ></textarea>
+            <button id="sendButton" onclick="sendMessage()" aria-label="Send message">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="disclaimer">
+            ⚠️ This is not professional medical advice. Consult a healthcare provider for diagnosis and treatment.
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const messagesContainer = document.getElementById('messagesContainer');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Auto-focus on page load
+        window.addEventListener('load', () => {
+            messageInput.focus();
+        });
+
+        // Auto-resize textarea as user types
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Send message on Enter key (Shift+Enter for new line)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Scroll to bottom of messages container
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Add message to chat
+        function addMessage(content, isUser) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.textContent = content;
+            
+            messageDiv.appendChild(bubbleDiv);
+            messagesContainer.appendChild(messageDiv);
+            
+            scrollToBottom();
+        }
+
+        // Show/hide typing indicator
+        function setTyping(isTyping) {
+            typingIndicator.classList.toggle('active', isTyping);
+            if (isTyping) {
+                scrollToBottom();
+            }
+        }
+
+        // Send message to backend
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            
+            // Validate message is not empty
+            if (!message) return;
+
+            // Disable input while processing
+            sendButton.disabled = true;
+            messageInput.disabled = true;
+
+            // Add user message to chat
+            addMessage(message, true);
+
+            // Clear input and reset height
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Show typing indicator
+            setTyping(true);
+
+            try {
+                // Send POST request to backend
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // Include cookies for session
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                setTyping(false);
+
+                if (data.success) {
+                    // Add assistant response to chat
+                    addMessage(data.message, false);
+                } else {
+                    // Show error message
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                }
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+                setTyping(false);
+                addMessage('Sorry, I could not connect to the server. Please check your connection and try again.', false);
+            } finally {
+                // Re-enable input
+                sendButton.disabled = false;
+                messageInput.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        // Clear chat history
+        async function clearChat() {
+            if (!confirm('Are you sure you want to clear the chat history?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/clear-session', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Clear messages from UI (keep only welcome message)
+                    messagesContainer.innerHTML = `
+                        <div class="message assistant">
+                            <div class="message-bubble">
+                                👋 Hello! I'm Medi-AI, your health information assistant. How can I help you today?
+                                <br><br>
+                                <small><em>Remember: I provide general information only and am not a substitute for professional medical advice.</em></small>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error clearing chat:', error);
+                alert('Failed to clear chat history. Please try again.');
+            }
+        }
+
+        // Keep focus on input
+        document.addEventListener('click', (e) => {
+            if (!e.target.matches('button, a')) {
+                messageInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
+

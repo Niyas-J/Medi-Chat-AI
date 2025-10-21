@@ -1,0 +1,78 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║        🌟 GEMINI API SETUP - 3 SIMPLE STEPS 🌟              ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 1: Get FREE Gemini API Key (No Credit Card!)         │
+└─────────────────────────────────────────────────────────────┘
+
+1. Open this link in your browser:
+   👉 https://makersuite.google.com/app/apikey
+   
+2. Sign in with your Google account
+
+3. Click "Create API Key"
+
+4. Select "Create API key in new project"
+
+5. COPY the API key (looks like: AIzaSyC...)
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 2: Update Your .env File                             │
+└─────────────────────────────────────────────────────────────┘
+
+Open your .env file and REPLACE everything with:
+
+─────────────────────────────────────────────────────────────
+# Google Gemini API Configuration
+GEMINI_API_KEY=paste_your_api_key_here
+
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Session Configuration
+SESSION_SECRET=db2d1c1e1596fc2c39260272de87da82a4a52d54e7ed157200a8f7f789d84da8
+
+# Frontend URL
+FRONTEND_URL=http://localhost:3000
+─────────────────────────────────────────────────────────────
+
+IMPORTANT: Replace "paste_your_api_key_here" with your actual key!
+
+
+┌─────────────────────────────────────────────────────────────┐
+│  STEP 3: Restart Server                                    │
+└─────────────────────────────────────────────────────────────┘
+
+Just say "restart" in the chat!
+
+
+═══════════════════════════════════════════════════════════════
+
+✅ BENEFITS OF GEMINI:
+
+• 100% FREE (no credit card needed)
+• 60 requests per minute
+• 1,500 requests per day
+• Works immediately
+• Same great quality as OpenAI
+
+═══════════════════════════════════════════════════════════════
+
+🆘 NEED HELP?
+
+Read the full guide: GEMINI_SETUP.md
+
+Quick link to get API key:
+https://makersuite.google.com/app/apikey
+
+═══════════════════════════════════════════════════════════════
+
+After updating .env file, just type "restart" and you're done!
+
+🎉 Your chatbot will work FOR FREE! 🎉
+
