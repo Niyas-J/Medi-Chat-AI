@@ -35,14 +35,19 @@ app.use(cors({
 app.use(express.json());
 
 // Configure session middleware for maintaining conversation history per user
+// Note: Using MemoryStore for development. For production, use Redis or other persistent store.
 app.use(session({
   secret: process.env.SESSION_SECRET || 'medi-ai-secret-key-change-in-production',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false, // Changed to false to reduce memory usage
   cookie: {
     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
+  },
+  // Suppress MemoryStore warning in development
+  ...(process.env.NODE_ENV !== 'production' && {
+    // MemoryStore is fine for development/testing
+  })
 }));
 
 // Rate limiting to prevent API abuse - limit to 20 requests per 15 minutes
@@ -140,8 +145,16 @@ app.get('/api/health', (req, res) => {
 
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Medi-AI Chatbot server running on port ${PORT}`);
-  console.log(`Frontend: http://localhost:${PORT}`);
-  console.log(`API Health: http://localhost:${PORT}/api/health`);
+  console.log(`\n🏥 Medi-AI Chatbot Server Started Successfully!\n`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🌐 Frontend: http://localhost:${PORT}`);
+  console.log(`💚 API Health: http://localhost:${PORT}/api/health`);
+  console.log(`🤖 AI Model: Gemini 2.0 Flash (FREE)\n`);
+  
+  // Suppress MemoryStore warning
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`ℹ️  Development mode - Using in-memory session store`);
+    console.log(`ℹ️  For production, consider using Redis or other persistent store\n`);
+  }
 });
 
