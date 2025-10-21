@@ -143,18 +143,19 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`\n🏥 Medi-AI Chatbot Server Started Successfully!\n`);
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌐 Frontend: http://localhost:${PORT}`);
-  console.log(`💚 API Health: http://localhost:${PORT}/api/health`);
-  console.log(`🤖 AI Model: Gemini 2.0 Flash (FREE)\n`);
-  
-  // Suppress MemoryStore warning
-  if (process.env.NODE_ENV !== 'production') {
+// Start the server (only in development, Vercel handles this in production)
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`\n🏥 Medi-AI Chatbot Server Started Successfully!\n`);
+    console.log(`✅ Server running on port ${PORT}`);
+    console.log(`🌐 Frontend: http://localhost:${PORT}`);
+    console.log(`💚 API Health: http://localhost:${PORT}/api/health`);
+    console.log(`🤖 AI Model: Gemini 2.0 Flash (FREE)\n`);
     console.log(`ℹ️  Development mode - Using in-memory session store`);
     console.log(`ℹ️  For production, consider using Redis or other persistent store\n`);
-  }
-});
+  });
+}
+
+// Export for Vercel serverless function
+module.exports = app;
 
